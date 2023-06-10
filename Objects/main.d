@@ -1,5 +1,6 @@
 .\objects\main.o: main.c
-.\objects\main.o: .\Core\Inc\i2c-lcd.h
+.\objects\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+.\objects\main.o: .\Core\Inc\main.h
 .\objects\main.o: .\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal.h
 .\objects\main.o: .\Core\Inc\stm32f1xx_hal_conf.h
 .\objects\main.o: .\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_rcc.h
@@ -24,5 +25,3 @@
 .\objects\main.o: .\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_flash_ex.h
 .\objects\main.o: .\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_i2c.h
 .\objects\main.o: .\Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_pwr.h
-.\objects\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
-.\objects\main.o: .\Core\Inc\main.h
