@@ -21,8 +21,39 @@ static void I2C2_Init(void);
 #define PWR_MGMT_1_REG 0x6B
 #define WHO_AM_I_REG 0x75
 
-#define THRESHOLD 0.3 // Nguong phát hien buoc chân
+#define WINDOW_SIZE 2    // Kích thuoc cua so luu tru du lieu gia toc
+#define THRESHOLD 1.25
 
+float acc_window[WINDOW_SIZE][3];
+int window_index = 0;
+float current = 0;
+
+int detectStep(float ax, float ay, float az) {
+  float acc_magnitude = sqrt(ax*ax + ay*ay + az*az);
+
+  // Thêm d? li?u gia t?c m?i vào c?a s? luu tr?
+  acc_window[window_index][0] = ax;
+  acc_window[window_index][1] = ay;
+  acc_window[window_index][2] = az;
+  window_index = (window_index + 1) % WINDOW_SIZE;
+
+  // Tính toán pic c?a gia t?c
+  float peak_value = 0.0;
+  for (int i = 0; i < WINDOW_SIZE; i++) {
+    float acc_magnitude_i = sqrt(acc_window[i][0]*acc_window[i][0] + acc_window[i][1]*acc_window[i][1] + acc_window[i][2]*acc_window[i][2]);
+    if (acc_magnitude_i > peak_value) {
+      peak_value = acc_magnitude_i;
+    }
+  }
+	current = peak_value;
+
+  // Ki?m tra n?u pic vu?t ngu?ng và d? s? bu?c t?i thi?u
+  if (peak_value > THRESHOLD) {
+    return 1;  // Tr? v? 1 d? ch? d?m bu?c chân
+  }
+
+  return 0;  // Không d?m bu?c chân
+}
 
 int16_t Accel_X_RAW = 0;
 int16_t Accel_Y_RAW = 0;
@@ -311,7 +342,7 @@ int main(void)
 
 			//Code dem buoc chân
 
-			currentVector = sqrt(Ax * Ax + Ay * Ay + Az * Az);
+			/*currentVector = sqrt(Ax * Ax + Ay * Ay + Az * Az);
 			diffVector = fabs(currentVector - previousVector);
 
 			// Kiem tra neu góc theta vuot quá nguong threshold
@@ -323,6 +354,16 @@ int main(void)
 			else if (diffVector <= thresholdVector)
 			{
 				stepDetected = 0;
+			} */
+			
+			//code dem buoc chan
+			if (detectStep(Ax, Ay, Az)) {
+					if (!stepDetected) {
+						stepCount++;
+						stepDetected = 1;
+					}
+			} else {
+					stepDetected = 0;
 			}
 			
 			lcd_send_cmd(0x80 | 0x00);  // goto 1,1
@@ -333,7 +374,7 @@ int main(void)
 
 			lcd_send_cmd(0x80 | 0x40);  // goto 2,1
 
-			sprintf(buf, "%.3f", diffVector);
+			sprintf(buf, "%.3f", current);
 			lcd_send_string(buf);
 
 			previousVector = currentVector;
