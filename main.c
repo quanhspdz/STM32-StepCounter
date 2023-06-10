@@ -21,7 +21,7 @@ static void I2C2_Init(void);
 #define PWR_MGMT_1_REG 0x6B
 #define WHO_AM_I_REG 0x75
 
-#define THRESHOLD 0.3 // Ngu?ng phát hi?n bu?c chân
+#define THRESHOLD 0.3 // Nguong phát hien buoc chân
 
 
 int16_t Accel_X_RAW = 0;
@@ -210,7 +210,7 @@ int main(void)
 	HAL_Delay(1000);  // wait for 1 sec
 	lcd_clear();
 
-	// Kh?i t?o bi?n d?m bu?c chân
+	// Khoi tao bien dem buoc chan
 	int stepCount = 0;
 	int pauseRequest = 0;
 	int stepDetected = 0;
@@ -218,60 +218,72 @@ int main(void)
 	float thresholdVector = 0.19;
 	float delayTime = 100;
 	
-	// Kh?i t?o c?u hình GPIO
+	// Khoi tao cau hinh GPIO
 	GPIO_InitTypeDef GPIO_InitStruct;
 	
-	// B?t Clock cho GPIOA
+	// Bat Clock cho GPIOA
 	__HAL_RCC_GPIOA_CLK_ENABLE();
 
-	// C?u hình chân PA0 và PA1 là input
+	// Cau hình chân PA0 và PA1 là input
 	GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1;
 	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
 	GPIO_InitStruct.Pull = GPIO_PULLUP; // S? d?ng pull-up resistor
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 	
-	// B?t Clock cho GPIOC
+	// Bat Clock cho GPIOC
   __HAL_RCC_GPIOC_CLK_ENABLE();
   
-  // C?u hình chân PC13 là output
+  // Cau hình chân PC13 là output (green led)
   GPIO_InitStruct.Pin = GPIO_PIN_13;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 	
-	// C?u hình SysTick timer
+	// Bat Clock cho GPIOB
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+  
+  // Cau hình chân PB4 là output (red led)
+  GPIO_InitStruct.Pin = GPIO_PIN_4;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+	
+	// Cau hình SysTick timer
 	SysTick_Config(SystemCoreClock / 2); // T?n s? SysTick là 1Hz (1 giây)
 
 	while (1)
 	{
-		// Ð?c tr?ng thái t? switch 1
+		// Ðoc trang thái tu switch 1
 		uint8_t switch1_state = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
 
-		// Ð?c tr?ng thái t? switch 2
+		// Ðoc trang thái tu switch 2
 		uint8_t switch2_state = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1);
 
 		if (switch1_state == GPIO_PIN_RESET) //sw1 là pause|resume
 		{
-			// T?m d?ng ho?c ti?p t?c d?m bu?c chân
+			// Tam dung hoc tiep tuc dem buoc chân
 			HAL_Delay(50); // delay tranh nhieu
 			if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) == GPIO_PIN_RESET)
 			{
-				pauseRequest = !pauseRequest; // Chuy?n d?i tr?ng thái t?m d?ng ho?c ti?p t?c
+				pauseRequest = !pauseRequest;
 				lcd_clear();
 			}
 		}
 
 		if (switch2_state == GPIO_PIN_RESET) //sw2 là reset stepCount
 		{
-			// Reset bi?n stepCount v? 0
+			// Reset bien stepCount bang 0
 			stepCount = 0;
 			lcd_clear();
 		}
 		
 		if (pauseRequest) {
-			//tat nhay den xanh chan pc13
+			//tat nhay den xanh chan PC13
 			HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+			//bat den do PB4 (red led)
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
 			
 			//in ra man hinh thong bao tam dung
 			lcd_send_cmd(0x80 | 0x00);  // goto 1,1
@@ -280,7 +292,7 @@ int main(void)
 			lcd_send_cmd(0x80 | 0x40);  // goto 2,1
 			lcd_send_string("to continue!");
 		} else {
-			// Nháy LED chân PC13 v?i t?n s? 1Hz
+			// Nháy LED chân PC13 voi tan so 1Hz
 			static uint32_t previousTick = 0;
 			uint32_t currentTick = HAL_GetTick();
 
@@ -290,28 +302,29 @@ int main(void)
 				HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
 			}
 			
+			//tat red led PB4
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
+			
 			// read the Accelerometer and Gyro values
 			MPU6050_Read_Accel();
 			MPU6050_Read_Gyro();
 
-			//Code d?m bu?c chân
+			//Code dem buoc chân
 
 			currentVector = sqrt(Ax * Ax + Ay * Ay + Az * Az);
 			diffVector = fabs(currentVector - previousVector);
 
-			// Ki?m tra n?u góc theta vu?t quá ngu?ng threshold
-			// N?u tang bình phuong gia t?c vu?t quá ngu?ng và chua phát hi?n bu?c chân tru?c dó
+			// Kiem tra neu góc theta vuot quá nguong threshold
+			// Neu tong bình phuong gia toc vuot quá nguong và chua phát hien buuc chân truoc dó
 			if (diffVector > thresholdVector && previousVector && !stepDetected)
 			{
-				stepCount++; // Tang bi?n d?m s? bu?c chân lên 1
+				stepCount++; 
 			}
 			else if (diffVector <= thresholdVector)
 			{
 				stepDetected = 0;
 			}
 			
-			// G?i l?nh clear screen d?n LCD
-
 			lcd_send_cmd(0x80 | 0x00);  // goto 1,1
 			lcd_send_string("StepCount: ");
 			sprintf(buf, "%d", stepCount);
