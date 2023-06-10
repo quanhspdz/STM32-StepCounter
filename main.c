@@ -5,9 +5,9 @@ I2C_HandleTypeDef hi2c1;
 I2C_HandleTypeDef hi2c2;
 
 void SystemClock_Config(void);
-static void MX_GPIO_Init(void);
-static void MX_I2C1_Init(void);
-static void MX_I2C2_Init(void);
+static void GPIO_Init(void);
+static void I2C1_Init(void);
+static void I2C2_Init(void);
 
 #define MPU6050_ADDR 0xD0
 
@@ -200,9 +200,9 @@ int main(void)
 
 	HAL_Init();
 	SystemClock_Config();
-	MX_GPIO_Init();
-	MX_I2C1_Init();
-	MX_I2C2_Init();
+	GPIO_Init();
+	I2C1_Init();
+	I2C2_Init();
 
 	lcd_init();
 	MPU6050_Init();
@@ -367,7 +367,7 @@ void SystemClock_Config(void)
   }
 }
 
-static void MX_I2C1_Init(void)
+static void I2C1_Init(void)
 {
   hi2c1.Instance = I2C1;
   hi2c1.Init.ClockSpeed = 100000;
@@ -384,7 +384,7 @@ static void MX_I2C1_Init(void)
   }
 
 }
-static void MX_I2C2_Init(void)
+static void I2C2_Init(void)
 {
   hi2c2.Instance = I2C2;
   hi2c2.Init.ClockSpeed = 100000;
@@ -401,7 +401,7 @@ static void MX_I2C2_Init(void)
   }
 }
 
-static void MX_GPIO_Init(void)
+static void GPIO_Init(void)
 {
 
   /* GPIO Ports Clock Enable */
