@@ -283,6 +283,13 @@ int main(void)
 	
 	// Cau hình SysTick timer
 	SysTick_Config(SystemCoreClock / 2); // T?n s? SysTick là 1Hz (1 giây)
+	
+	// cau hinh chan PA1 có muc do ngat uu tien cao hon PA0
+	HAL_NVIC_SetPriority(EXTI0_IRQn, 3, 0); //sw0
+  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI1_IRQn, 4, 0); //sw1
+  HAL_NVIC_EnableIRQ(EXTI1_IRQn);
 
 	while (1)
 	{
