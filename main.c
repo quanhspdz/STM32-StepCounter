@@ -12,14 +12,14 @@ static void I2C2_Init(void);
 #define MPU6050_ADDR 0xD0
 
 
-#define SMPLRT_DIV_REG 0x19
-#define GYRO_CONFIG_REG 0x1B
-#define ACCEL_CONFIG_REG 0x1C
-#define ACCEL_XOUT_H_REG 0x3B
-#define TEMP_OUT_H_REG 0x41
-#define GYRO_XOUT_H_REG 0x43
-#define PWR_MGMT_1_REG 0x6B
-#define WHO_AM_I_REG 0x75
+#define SMPLRT_DIV_REG 0x19 //cau hinh tan so lay mau cho cam bien
+#define GYRO_CONFIG_REG 0x1B  //cau hinh cho cam bien con quay hoi chuyen 
+#define ACCEL_CONFIG_REG 0x1C //cau hinh cho cam bien gia toc (pham vi do...)
+#define ACCEL_XOUT_H_REG 0x3B //dia chi thanh ghi la dia chi cua byte cao nhat cua cam bien gia toc theo truc X
+#define TEMP_OUT_H_REG 0x41 //dia chi thanh ghi la dia chi cua byte cao nhat cua cam bien nhiet do
+#define GYRO_XOUT_H_REG 0x43 //dia chi byte cao nhat trong du lieu cam bien con quay truc X
+#define PWR_MGMT_1_REG 0x6B //cau hinh cac che do tiet kiem nang luong, quan ly hoat dong
+#define WHO_AM_I_REG 0x75 //kiem tra ket noi voi cam bien
 
 #define WINDOW_SIZE 2    // Kích thuoc cua so luu tru du lieu gia toc
 #define THRESHOLD 1.25
@@ -65,7 +65,7 @@ int16_t Gyro_Z_RAW = 0;
 
 float Ax, Ay, Az, Gx, Gy, Gz;
 
-#define SLAVE_ADDRESS_LCD 0x4E // change this according to ur setup
+#define SLAVE_ADDRESS_LCD 0x4E // lcd address
 
 void lcd_send_cmd (char cmd)
 {
@@ -346,22 +346,6 @@ int main(void)
 			// read the Accelerometer and Gyro values
 			MPU6050_Read_Accel();
 			MPU6050_Read_Gyro();
-
-			//Code dem buoc chân
-
-			/*currentVector = sqrt(Ax * Ax + Ay * Ay + Az * Az);
-			diffVector = fabs(currentVector - previousVector);
-
-			// Kiem tra neu góc theta vuot quá nguong threshold
-			// Neu tong bình phuong gia toc vuot quá nguong và chua phát hien buuc chân truoc dó
-			if (diffVector > thresholdVector && previousVector && !stepDetected)
-			{
-				stepCount++; 
-			}
-			else if (diffVector <= thresholdVector)
-			{
-				stepDetected = 0;
-			} */
 			
 			//code dem buoc chan
 			if (detectStep(Ax, Ay, Az)) {
