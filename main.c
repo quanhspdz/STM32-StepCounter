@@ -321,7 +321,7 @@ int main(void)
 			//tat nhay den xanh chan PC13
 			HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
 			//bat den do PB4 (red led)
-			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
 			
 			//in ra man hinh thong bao tam dung
 			lcd_send_cmd(0x80 | 0x00);  // goto 1,1
@@ -341,7 +341,7 @@ int main(void)
 			}
 			
 			//tat red led PB4
-			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
 			
 			// read the Accelerometer and Gyro values
 			MPU6050_Read_Accel();
